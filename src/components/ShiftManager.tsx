@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Users, Plus, Trash2, Download, Filter, Edit2, X, Check, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import AdminLogin from './AdminLogin';
 
 interface Person {
   id: number;
@@ -55,6 +56,7 @@ const ShiftManager = () => {
   const [showConstraints, setShowConstraints] = useState(false);
   const [selectedPerson1, setSelectedPerson1] = useState('');
   const [selectedPerson2, setSelectedPerson2] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Salvataggio automatico su localStorage
   useEffect(() => {
@@ -73,16 +75,32 @@ const ShiftManager = () => {
       const peopleData = localStorage.getItem('shift-people');
       const shiftsData = localStorage.getItem('shift-shifts');
       const constraintsData = localStorage.getItem('shift-constraints');
+      const adminData = localStorage.getItem('shift-admin');
       
       if (peopleData) setPeople(JSON.parse(peopleData));
       if (shiftsData) setShifts(JSON.parse(shiftsData));
       if (constraintsData) setConstraints(JSON.parse(constraintsData));
+      if (adminData) setIsAdmin(JSON.parse(adminData));
     } catch (error) {
       console.log('Primi dati caricati');
     }
   }, []);
 
+  const handleLogin = () => {
+    setIsAdmin(true);
+    localStorage.setItem('shift-admin', 'true');
+  };
+
+  const handleLogout = () => {
+    setIsAdmin(false);
+    localStorage.setItem('shift-admin', 'false');
+  };
+
   const addPerson = () => {
+    if (!isAdmin) {
+      toast.error('Accesso amministratore richiesto');
+      return;
+    }
     if (!newPersonName.trim()) {
       toast.error('Inserisci un nome valido');
       return;
@@ -100,6 +118,10 @@ const ShiftManager = () => {
   };
 
   const deletePerson = (id: number) => {
+    if (!isAdmin) {
+      toast.error('Accesso amministratore richiesto');
+      return;
+    }
     const person = people.find(p => p.id === id);
     setPeople(people.filter(p => p.id !== id));
     setShifts(shifts.map(shift => ({
@@ -111,10 +133,18 @@ const ShiftManager = () => {
   };
 
   const updatePersonColor = (id: number, color: string) => {
+    if (!isAdmin) {
+      toast.error('Accesso amministratore richiesto');
+      return;
+    }
     setPeople(people.map(p => p.id === id ? { ...p, color } : p));
   };
 
   const updatePersonName = (id: number, name: string) => {
+    if (!isAdmin) {
+      toast.error('Accesso amministratore richiesto');
+      return;
+    }
     if (!name.trim()) return;
     setPeople(people.map(p => p.id === id ? { ...p, name } : p));
     setEditingPerson(null);
@@ -122,6 +152,10 @@ const ShiftManager = () => {
   };
 
   const addShift = () => {
+    if (!isAdmin) {
+      toast.error('Accesso amministratore richiesto');
+      return;
+    }
     if (!newShiftDate) {
       toast.error('Seleziona una data');
       return;
@@ -138,11 +172,19 @@ const ShiftManager = () => {
   };
 
   const deleteShift = (id: number) => {
+    if (!isAdmin) {
+      toast.error('Accesso amministratore richiesto');
+      return;
+    }
     setShifts(shifts.filter(s => s.id !== id));
     toast.success('Turno eliminato');
   };
 
   const togglePersonInShift = (shiftId: number, personId: number) => {
+    if (!isAdmin) {
+      toast.error('Accesso amministratore richiesto');
+      return;
+    }
     const shift = shifts.find(s => s.id === shiftId);
     if (!shift) return;
 
@@ -191,6 +233,10 @@ const ShiftManager = () => {
   };
 
   const deleteConstraint = (id: number) => {
+    if (!isAdmin) {
+      toast.error('Accesso amministratore richiesto');
+      return;
+    }
     setConstraints(constraints.filter(c => c.id !== id));
     toast.success('Vincolo eliminato');
   };
@@ -386,13 +432,20 @@ const ShiftManager = () => {
                 <Calendar className="w-8 h-8" />
                 <h1 className="text-3xl font-bold">Gestione Turni di Riposo</h1>
               </div>
-              <button
-                onClick={exportToPDF}
-                className="flex items-center gap-2 bg-card text-primary px-4 py-2 rounded-lg hover:shadow-lg transition-all"
-              >
-                <Download className="w-5 h-5" />
-                Esporta PDF
-              </button>
+              <div className="flex items-center gap-3">
+                <AdminLogin 
+                  isAdmin={isAdmin}
+                  onLogin={handleLogin}
+                  onLogout={handleLogout}
+                />
+                <button
+                  onClick={exportToPDF}
+                  className="flex items-center gap-2 bg-card text-primary px-4 py-2 rounded-lg hover:shadow-lg transition-all"
+                >
+                  <Download className="w-5 h-5" />
+                  Esporta PDF
+                </button>
+              </div>
             </div>
           </div>
 
@@ -464,8 +517,9 @@ const ShiftManager = () => {
                       Vincoli
                     </button>
                     <button
-                      onClick={() => setShowAddShift(true)}
-                      className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:shadow-lg transition-all"
+                      onClick={() => isAdmin ? setShowAddShift(true) : toast.error('Accesso amministratore richiesto')}
+                      className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:shadow-lg transition-all disabled:opacity-50"
+                      disabled={!isAdmin}
                     >
                       <Plus className="w-5 h-5" />
                       Aggiungi Turno
@@ -626,8 +680,9 @@ const ShiftManager = () => {
               <div>
                 <div className="mb-6">
                   <button
-                    onClick={() => setShowAddPerson(true)}
-                    className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:shadow-lg transition-all"
+                    onClick={() => isAdmin ? setShowAddPerson(true) : toast.error('Accesso amministratore richiesto')}
+                    className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:shadow-lg transition-all disabled:opacity-50"
+                    disabled={!isAdmin}
                   >
                     <Plus className="w-5 h-5" />
                     Aggiungi Persona
