@@ -34,15 +34,16 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ isAdmin, onLogin, onLogout }) =
 
   if (isAdmin) {
     return (
-      <div className="flex items-center gap-3 bg-accent/20 px-4 py-2 rounded-lg border border-accent">
-        <Lock className="w-4 h-4 text-accent-foreground" />
-        <span className="text-sm font-medium text-accent-foreground">Modalità Amministratore</span>
+      <div style={{ backgroundColor: '#FFDD00', color: '#003D7A' }} className="flex items-center gap-3 px-4 py-2 rounded-lg border-2 border-[#003D7A] shadow-lg">
+        <Lock className="w-5 h-5" />
+        <span className="text-sm font-bold">MODALITÀ AMMINISTRATORE</span>
         <button
           onClick={handleLogout}
-          className="ml-2 text-accent-foreground hover:text-destructive transition"
+          className="ml-2 hover:opacity-70 transition"
           title="Esci"
+          style={{ color: '#003D7A' }}
         >
-          <LogOut className="w-4 h-4" />
+          <LogOut className="w-5 h-5" />
         </button>
       </div>
     );
@@ -52,10 +53,11 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ isAdmin, onLogin, onLogout }) =
     return (
       <button
         onClick={() => setShowLogin(true)}
-        className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition"
+        style={{ backgroundColor: 'rgba(255, 221, 0, 0.2)', color: '#FFDD00' }}
+        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-opacity-30 transition border border-[#FFDD00]/50"
       >
-        <Lock className="w-4 h-4" />
-        <span className="text-sm">Admin</span>
+        <Lock className="w-5 h-5" />
+        <span className="text-sm font-semibold">Accedi Admin</span>
       </button>
     );
   }
