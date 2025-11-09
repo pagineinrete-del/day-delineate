@@ -624,55 +624,53 @@ const ShiftManager = () => {
 
                 {/* Tabella Turni */}
                 <div className="overflow-x-auto">
-                  <table className="w-full border-collapse">
+                  <table className="w-full border-collapse bg-card">
                     <thead>
-                      <tr className="bg-gradient-to-r from-primary/10 to-accent/10">
-                        <th className="border border-border px-4 py-3 text-left font-semibold text-foreground">Data</th>
-                        <th className="border border-border px-4 py-3 text-left font-semibold text-foreground bg-red-50">🏖️ A Riposo</th>
-                        <th className="border border-border px-4 py-3 text-left font-semibold text-foreground bg-green-50">💼 Al Lavoro</th>
-                        {isAdmin && <th className="border border-border px-4 py-3 text-center font-semibold text-foreground w-24">Azioni</th>}
+                      <tr className="bg-primary text-primary-foreground">
+                        <th className="border border-border px-4 py-3 text-left font-semibold">Data</th>
+                        <th className="border border-border px-4 py-3 text-left font-semibold">🏖️ A Riposo</th>
+                        <th className="border border-border px-4 py-3 text-left font-semibold">💼 Al Lavoro</th>
+                        {isAdmin && <th className="border border-border px-4 py-3 text-center font-semibold w-24">Azioni</th>}
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredShifts.map(shift => {
+                      {filteredShifts.map((shift, index) => {
                         const restingPeople = people.filter(p => shift.peopleIds.includes(p.id));
                         const workingPeople = people.filter(p => !shift.peopleIds.includes(p.id));
                         
                         return (
-                          <tr key={shift.id} className="hover:bg-muted/50 transition">
-                            <td className="border border-border px-4 py-3 font-medium">
+                          <tr key={shift.id} className={`${index % 2 === 0 ? 'bg-muted/30' : 'bg-card'} hover:bg-muted/50 transition`}>
+                            <td className="border border-border px-4 py-3 font-semibold text-foreground">
                               {new Date(shift.date + 'T00:00:00').toLocaleDateString('it-IT', { 
-                                weekday: 'short', 
-                                year: 'numeric', 
-                                month: 'short', 
-                                day: 'numeric' 
+                                weekday: 'long', 
+                                day: 'numeric', 
+                                month: 'long'
                               })}
                             </td>
-                            <td className="border border-border px-4 py-3 bg-red-50/50">
-                              <div className="flex flex-wrap gap-2">
+                            <td className="border border-border px-4 py-3">
+                              <div className="space-y-1">
                                 {isAdmin ? (
-                                  people.map(person => (
-                                    <button
-                                      key={person.id}
-                                      onClick={() => togglePersonInShift(shift.id, person.id)}
-                                      className={`px-3 py-1 rounded-full text-white font-medium transition transform hover:scale-105 ${
-                                        shift.peopleIds.includes(person.id) ? 'shadow-lg' : 'opacity-30'
-                                      }`}
-                                      style={{ backgroundColor: person.color }}
-                                    >
-                                      {person.name}
-                                    </button>
-                                  ))
+                                  <div className="flex flex-wrap gap-2">
+                                    {people.map(person => (
+                                      <button
+                                        key={person.id}
+                                        onClick={() => togglePersonInShift(shift.id, person.id)}
+                                        className={`px-3 py-1 rounded border-2 font-medium transition ${
+                                          shift.peopleIds.includes(person.id) 
+                                            ? 'bg-primary text-primary-foreground border-primary shadow-sm' 
+                                            : 'bg-background text-muted-foreground border-border hover:border-primary/50'
+                                        }`}
+                                      >
+                                        {person.name}
+                                      </button>
+                                    ))}
+                                  </div>
                                 ) : (
                                   restingPeople.length > 0 ? (
                                     restingPeople.map(person => (
-                                      <span
-                                        key={person.id}
-                                        className="px-3 py-1 rounded-full text-white font-medium shadow-lg"
-                                        style={{ backgroundColor: person.color }}
-                                      >
-                                        {person.name}
-                                      </span>
+                                      <div key={person.id} className="text-foreground font-medium">
+                                        • {person.name}
+                                      </div>
                                     ))
                                   ) : (
                                     <span className="text-muted-foreground italic">Nessuno</span>
@@ -680,17 +678,13 @@ const ShiftManager = () => {
                                 )}
                               </div>
                             </td>
-                            <td className="border border-border px-4 py-3 bg-green-50/50">
-                              <div className="flex flex-wrap gap-2">
+                            <td className="border border-border px-4 py-3">
+                              <div className="space-y-1">
                                 {workingPeople.length > 0 ? (
                                   workingPeople.map(person => (
-                                    <span
-                                      key={person.id}
-                                      className="px-3 py-1 rounded-full text-white font-medium shadow-lg"
-                                      style={{ backgroundColor: person.color }}
-                                    >
-                                      {person.name}
-                                    </span>
+                                    <div key={person.id} className="text-muted-foreground">
+                                      • {person.name}
+                                    </div>
                                   ))
                                 ) : (
                                   <span className="text-muted-foreground italic">Nessuno</span>
