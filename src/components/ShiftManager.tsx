@@ -27,12 +27,11 @@ const ShiftManager = () => {
     { id: 2, name: 'Luana', color: '#ef4444' },
     { id: 3, name: 'Paolo', color: '#10b981' },
     { id: 4, name: 'Emanuele', color: '#f59e0b' },
-    { id: 5, name: 'Ruffina', color: '#8b5cf6' }
+    { id: 5, name: 'Ruffina', color: '#8b5cf6' },
+    { id: 6, name: 'Mirco', color: '#ec4899' }
   ]);
 
   const [shifts, setShifts] = useState<Shift[]>([
-    { id: 1, date: '2025-11-01', peopleIds: [1, 2] },
-    { id: 2, date: '2025-11-08', peopleIds: [3, 4] },
     { id: 3, date: '2025-11-15', peopleIds: [5, 1] },
     { id: 4, date: '2025-11-22', peopleIds: [2, 4] },
     { id: 5, date: '2025-11-29', peopleIds: [3, 1] },
@@ -629,47 +628,88 @@ const ShiftManager = () => {
                     <thead>
                       <tr className="bg-gradient-to-r from-primary/10 to-accent/10">
                         <th className="border border-border px-4 py-3 text-left font-semibold text-foreground">Data</th>
-                        <th className="border border-border px-4 py-3 text-left font-semibold text-foreground">Persone a Riposo</th>
-                        <th className="border border-border px-4 py-3 text-center font-semibold text-foreground w-24">Azioni</th>
+                        <th className="border border-border px-4 py-3 text-left font-semibold text-foreground bg-red-50">🏖️ A Riposo</th>
+                        <th className="border border-border px-4 py-3 text-left font-semibold text-foreground bg-green-50">💼 Al Lavoro</th>
+                        {isAdmin && <th className="border border-border px-4 py-3 text-center font-semibold text-foreground w-24">Azioni</th>}
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredShifts.map(shift => (
-                        <tr key={shift.id} className="hover:bg-muted/50 transition">
-                          <td className="border border-border px-4 py-3 font-medium">
-                            {new Date(shift.date + 'T00:00:00').toLocaleDateString('it-IT', { 
-                              weekday: 'short', 
-                              year: 'numeric', 
-                              month: 'short', 
-                              day: 'numeric' 
-                            })}
-                          </td>
-                          <td className="border border-border px-4 py-3">
-                            <div className="flex flex-wrap gap-2">
-                              {people.map(person => (
+                      {filteredShifts.map(shift => {
+                        const restingPeople = people.filter(p => shift.peopleIds.includes(p.id));
+                        const workingPeople = people.filter(p => !shift.peopleIds.includes(p.id));
+                        
+                        return (
+                          <tr key={shift.id} className="hover:bg-muted/50 transition">
+                            <td className="border border-border px-4 py-3 font-medium">
+                              {new Date(shift.date + 'T00:00:00').toLocaleDateString('it-IT', { 
+                                weekday: 'short', 
+                                year: 'numeric', 
+                                month: 'short', 
+                                day: 'numeric' 
+                              })}
+                            </td>
+                            <td className="border border-border px-4 py-3 bg-red-50/50">
+                              <div className="flex flex-wrap gap-2">
+                                {isAdmin ? (
+                                  people.map(person => (
+                                    <button
+                                      key={person.id}
+                                      onClick={() => togglePersonInShift(shift.id, person.id)}
+                                      className={`px-3 py-1 rounded-full text-white font-medium transition transform hover:scale-105 ${
+                                        shift.peopleIds.includes(person.id) ? 'shadow-lg' : 'opacity-30'
+                                      }`}
+                                      style={{ backgroundColor: person.color }}
+                                    >
+                                      {person.name}
+                                    </button>
+                                  ))
+                                ) : (
+                                  restingPeople.length > 0 ? (
+                                    restingPeople.map(person => (
+                                      <span
+                                        key={person.id}
+                                        className="px-3 py-1 rounded-full text-white font-medium shadow-lg"
+                                        style={{ backgroundColor: person.color }}
+                                      >
+                                        {person.name}
+                                      </span>
+                                    ))
+                                  ) : (
+                                    <span className="text-muted-foreground italic">Nessuno</span>
+                                  )
+                                )}
+                              </div>
+                            </td>
+                            <td className="border border-border px-4 py-3 bg-green-50/50">
+                              <div className="flex flex-wrap gap-2">
+                                {workingPeople.length > 0 ? (
+                                  workingPeople.map(person => (
+                                    <span
+                                      key={person.id}
+                                      className="px-3 py-1 rounded-full text-white font-medium shadow-lg"
+                                      style={{ backgroundColor: person.color }}
+                                    >
+                                      {person.name}
+                                    </span>
+                                  ))
+                                ) : (
+                                  <span className="text-muted-foreground italic">Nessuno</span>
+                                )}
+                              </div>
+                            </td>
+                            {isAdmin && (
+                              <td className="border border-border px-4 py-3 text-center">
                                 <button
-                                  key={person.id}
-                                  onClick={() => togglePersonInShift(shift.id, person.id)}
-                                  className={`px-3 py-1 rounded-full text-white font-medium transition transform hover:scale-105 ${
-                                    shift.peopleIds.includes(person.id) ? 'shadow-lg' : 'opacity-40'
-                                  }`}
-                                  style={{ backgroundColor: person.color }}
+                                  onClick={() => deleteShift(shift.id)}
+                                  className="text-destructive hover:text-destructive/80 transition"
                                 >
-                                  {person.name}
+                                  <Trash2 className="w-5 h-5" />
                                 </button>
-                              ))}
-                            </div>
-                          </td>
-                          <td className="border border-border px-4 py-3 text-center">
-                            <button
-                              onClick={() => deleteShift(shift.id)}
-                              className="text-destructive hover:text-destructive/80 transition"
-                            >
-                              <Trash2 className="w-5 h-5" />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
+                              </td>
+                            )}
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
