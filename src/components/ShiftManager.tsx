@@ -23,12 +23,12 @@ interface Constraint {
 
 const ShiftManager = () => {
   const [people, setPeople] = useState<Person[]>([
-    { id: 1, name: 'Gennaro', color: '#3b82f6' },
-    { id: 2, name: 'Luana', color: '#ef4444' },
-    { id: 3, name: 'Paolo', color: '#10b981' },
-    { id: 4, name: 'Emanuele', color: '#f59e0b' },
-    { id: 5, name: 'Ruffina', color: '#8b5cf6' },
-    { id: 6, name: 'Mirco', color: '#ec4899' }
+    { id: 1, name: 'Gennaro', color: '#003D7A' },
+    { id: 2, name: 'Luana', color: '#FFDD00' },
+    { id: 3, name: 'Paolo', color: '#0055A6' },
+    { id: 4, name: 'Emanuele', color: '#FFC500' },
+    { id: 5, name: 'Ruffina', color: '#0077CC' },
+    { id: 6, name: 'Mirco', color: '#FF9500' }
   ]);
 
   const [shifts, setShifts] = useState<Shift[]>([
