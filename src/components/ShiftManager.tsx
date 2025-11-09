@@ -425,10 +425,10 @@ const ShiftManager = () => {
       <div className="max-w-7xl mx-auto">
         <div className="bg-card rounded-2xl shadow-card overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-primary p-6 text-primary-foreground">
+          <div style={{ backgroundColor: '#003D7A' }} className="p-6 text-white">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-3">
-                <Calendar className="w-8 h-8" />
+                <Calendar className="w-8 h-8" style={{ color: '#FFDD00' }} />
                 <h1 className="text-3xl font-bold">Gestione Turni di Riposo</h1>
               </div>
               <div className="flex items-center gap-3">
@@ -439,7 +439,8 @@ const ShiftManager = () => {
                 />
                 <button
                   onClick={exportToPDF}
-                  className="flex items-center gap-2 bg-card text-primary px-4 py-2 rounded-lg hover:shadow-lg transition-all"
+                  style={{ backgroundColor: '#FFDD00', color: '#003D7A' }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg hover:shadow-lg transition-all font-semibold"
                 >
                   <Download className="w-5 h-5" />
                   Esporta PDF
